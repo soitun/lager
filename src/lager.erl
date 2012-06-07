@@ -80,10 +80,10 @@ dispatch_log(Severity, Module, Function, Line, Pid, Traces, Format, Args) ->
 %% @private
 -spec log(log_level(), atom(), atom(), pos_integer(), pid(), tuple(), string(), list()) ->
     ok | {error, lager_not_running}.
-log(Level, Module, Function, Line, Pid, Time, Format, Args) ->
+log(Level, Module, _Function, Line, Pid, Time, Format, Args) ->
     Timestamp = lager_util:format_time(Time),
     Msg = [["[", atom_to_list(Level), "] "],
-           io_lib:format("~p@~p:~p:~p ", [Pid, Module, Function, Line]),
+           io_lib:format("~p@~p:~p ", [Pid, Module, Line]),
            safe_format_chop(Format, Args, 4096)],
     safe_notify({log, lager_util:level_to_num(Level), Timestamp, Msg}).
 
@@ -92,10 +92,10 @@ log(Level, Module, Function, Line, Pid, Time, Format, Args) ->
     ok | {error, lager_not_running}.
 log_dest(_Level, _Module, _Function, _Line, _Pid, _Time, [], _Format, _Args) ->
     ok;
-log_dest(Level, Module, Function, Line, Pid, Time, Dest, Format, Args) ->
+log_dest(Level, Module, _Function, Line, Pid, Time, Dest, Format, Args) ->
     Timestamp = lager_util:format_time(Time),
     Msg = [["[", atom_to_list(Level), "] "],
-           io_lib:format("~p@~p:~p:~p ", [Pid, Module, Function, Line]),
+           io_lib:format("~p@~p:~p ", [Pid, Module, Line]),
            safe_format_chop(Format, Args, 4096)],
     safe_notify({log, Dest, lager_util:level_to_num(Level), Timestamp, Msg}).
 

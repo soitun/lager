@@ -27,7 +27,7 @@
         clear_all_traces/0, stop_trace/1, status/0,
         get_loglevel/1, set_loglevel/2, set_loglevel/3, get_loglevels/0,
         minimum_loglevel/1, posix_error/1,
-        safe_format/3, safe_format_chop/3,dispatch_log/8]).
+        safe_format/3, dispatch_log/8]). %safe_format_chop/3,
 
 -type log_level() :: debug | info | notice | warning | error | critical | alert | emergency.
 -type log_level_number() :: 0..7.
@@ -84,7 +84,7 @@ log(Level, Module, _Function, Line, Pid, Time, Format, Args) ->
     Timestamp = lager_util:format_time(Time),
     Msg = [["[", atom_to_list(Level), "] "],
            io_lib:format("~p@~p:~p ", [Pid, Module, Line]),
-           safe_format_chop(Format, Args, 4096)],
+           io_lib:format(Format, Args)],
     safe_notify({log, lager_util:level_to_num(Level), Timestamp, Msg}).
 
 %% @private
@@ -96,7 +96,7 @@ log_dest(Level, Module, _Function, Line, Pid, Time, Dest, Format, Args) ->
     Timestamp = lager_util:format_time(Time),
     Msg = [["[", atom_to_list(Level), "] "],
            io_lib:format("~p@~p:~p ", [Pid, Module, Line]),
-           safe_format_chop(Format, Args, 4096)],
+           io_lib:format(Format, Args)],
     safe_notify({log, Dest, lager_util:level_to_num(Level), Timestamp, Msg}).
 
 
@@ -105,7 +105,7 @@ log_dest(Level, Module, _Function, Line, Pid, Time, Dest, Format, Args) ->
 log(Level, Pid, Message) ->
     Timestamp = lager_util:format_time(),
     Msg = [["[", atom_to_list(Level), "] "], io_lib:format("~p ", [Pid]),
-           safe_format_chop("~s", [Message], 4096)],
+           io_lib:format("~s", [Message])],
     safe_notify({log, lager_util:level_to_num(Level), Timestamp, Msg}).
 
 %% @doc Manually log a message into lager without using the parse transform.
@@ -113,7 +113,7 @@ log(Level, Pid, Message) ->
 log(Level, Pid, Format, Args) ->
     Timestamp = lager_util:format_time(),
     Msg = [["[", atom_to_list(Level), "] "], io_lib:format("~p ", [Pid]),
-           safe_format_chop(Format, Args, 4096)],
+           io_lib:format(Format, Args)],
     safe_notify({log, lager_util:level_to_num(Level), Timestamp, Msg}).
 
 trace_file(File, Filter) ->
